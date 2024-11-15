@@ -1,1 +1,1 @@
-#include "neopixelbus/src/NeoPixelAnimator.h"
+#include "NeoPixelBus/src/NeoPixelAnimator.h"

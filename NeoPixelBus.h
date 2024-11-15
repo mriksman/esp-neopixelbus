@@ -46,57 +46,57 @@ License along with NeoPixel.  If not, see
 // '_state' flags for internal state
 #define NEO_DIRTY   0x80 // a change was made to pixel data that requires a show
 
-#include "neopixelbus/src/internal/NeoHueBlend.h"
+#include "NeoPixelBus/src/internal/NeoHueBlend.h"
 
-#include "neopixelbus/src/internal/NeoSettings.h"
+#include "NeoPixelBus/src/internal/NeoSettings.h"
 
-#include "neopixelbus/src/internal/RgbColor.h"
-#include "neopixelbus/src/internal/Rgb16Color.h"
-#include "neopixelbus/src/internal/Rgb48Color.h"
-#include "neopixelbus/src/internal/HslColor.h"
-#include "neopixelbus/src/internal/HsbColor.h"
-#include "neopixelbus/src/internal/HtmlColor.h"
-#include "neopixelbus/src/internal/RgbwColor.h"
-#include "neopixelbus/src/internal/SegmentDigit.h"
+#include "NeoPixelBus/src/internal/RgbColor.h"
+#include "NeoPixelBus/src/internal/Rgb16Color.h"
+#include "NeoPixelBus/src/internal/Rgb48Color.h"
+#include "NeoPixelBus/src/internal/HslColor.h"
+#include "NeoPixelBus/src/internal/HsbColor.h"
+#include "NeoPixelBus/src/internal/HtmlColor.h"
+#include "NeoPixelBus/src/internal/RgbwColor.h"
+#include "NeoPixelBus/src/internal/SegmentDigit.h"
 
-#include "neopixelbus/src/internal/NeoColorFeatures.h"
-#include "neopixelbus/src/internal/NeoTm1814ColorFeatures.h"
-#include "neopixelbus/src/internal/DotStarColorFeatures.h"
-#include "neopixelbus/src/internal/Lpd8806ColorFeatures.h"
-#include "neopixelbus/src/internal/Lpd6803ColorFeatures.h"
-#include "neopixelbus/src/internal/P9813ColorFeatures.h"
-#include "neopixelbus/src/internal/NeoSegmentFeatures.h"
+#include "NeoPixelBus/src/internal/NeoColorFeatures.h"
+#include "NeoPixelBus/src/internal/NeoTm1814ColorFeatures.h"
+#include "NeoPixelBus/src/internal/DotStarColorFeatures.h"
+#include "NeoPixelBus/src/internal/Lpd8806ColorFeatures.h"
+#include "NeoPixelBus/src/internal/Lpd6803ColorFeatures.h"
+#include "NeoPixelBus/src/internal/P9813ColorFeatures.h"
+#include "NeoPixelBus/src/internal/NeoSegmentFeatures.h"
 
-#include "neopixelbus/src/internal/Layouts.h"
-#include "neopixelbus/src/internal/NeoTopology.h"
-#include "neopixelbus/src/internal/NeoRingTopology.h"
-#include "neopixelbus/src/internal/NeoTiles.h"
-#include "neopixelbus/src/internal/NeoMosaic.h"
+#include "NeoPixelBus/src/internal/Layouts.h"
+#include "NeoPixelBus/src/internal/NeoTopology.h"
+#include "NeoPixelBus/src/internal/NeoRingTopology.h"
+#include "NeoPixelBus/src/internal/NeoTiles.h"
+#include "NeoPixelBus/src/internal/NeoMosaic.h"
 
-#include "neopixelbus/src/internal/NeoBufferContext.h"
-#include "neopixelbus/src/internal/NeoBufferMethods.h"
-#include "neopixelbus/src/internal/NeoBuffer.h"
-#include "neopixelbus/src/internal/NeoSpriteSheet.h"
-#include "neopixelbus/src/internal/NeoDib.h"
-#include "neopixelbus/src/internal/NeoBitmapFile.h"
+#include "NeoPixelBus/src/internal/NeoBufferContext.h"
+#include "NeoPixelBus/src/internal/NeoBufferMethods.h"
+#include "NeoPixelBus/src/internal/NeoBuffer.h"
+#include "NeoPixelBus/src/internal/NeoSpriteSheet.h"
+#include "NeoPixelBus/src/internal/NeoDib.h"
+#include "NeoPixelBus/src/internal/NeoBitmapFile.h"
 
-#include "neopixelbus/src/internal/NeoEase.h"
-#include "neopixelbus/src/internal/NeoGamma.h"
+#include "NeoPixelBus/src/internal/NeoEase.h"
+#include "NeoPixelBus/src/internal/NeoGamma.h"
 
-#include "neopixelbus/src/internal/NeoBusChannel.h"
+#include "NeoPixelBus/src/internal/NeoBusChannel.h"
 
 /** These require TwoWireBitBangImple.h which uses Arduino defines not supported/ported **/
-//#include "neopixelbus/src/internal/DotStarGenericMethod.h"
-//#include "neopixelbus/src/internal/Lpd8806GenericMethod.h"
-//#include "neopixelbus/src/internal/Lpd6803GenericMethod.h"
-//#include "neopixelbus/src/internal/Ws2801GenericMethod.h"
-//#include "neopixelbus/src/internal/P9813GenericMethod.h"
+//#include "NeoPixelBus/src/internal/DotStarGenericMethod.h"
+//#include "NeoPixelBus/src/internal/Lpd8806GenericMethod.h"
+//#include "NeoPixelBus/src/internal/Lpd6803GenericMethod.h"
+//#include "NeoPixelBus/src/internal/Ws2801GenericMethod.h"
+//#include "NeoPixelBus/src/internal/P9813GenericMethod.h"
 
 // needs to be defined in CMakeLists (for .cpp compilation) and also here (for use in the .h file)
 #define ARDUINO_ARCH_ESP32 1
 #define NEOPIXEL_ESP32_RMT_DEFAULT 1
-//#include "neopixelbus/src/internal/NeoEsp32I2sMethod.h"     //haven't ported this yet
-#include "neopixelbus/src/internal/NeoEsp32RmtMethod.h"
+//#include "NeoPixelBus/src/internal/NeoEsp32I2sMethod.h"     //haven't ported this yet
+#include "NeoPixelBus/src/internal/NeoEsp32RmtMethod.h"
 
 
 /**** below is the same as the original NeoPixelBus.h file ****/
