@@ -14,6 +14,7 @@ idf_component_register(
         "NeoPixelBus/src/internal/RgbColorBase.cpp"
         "NeoPixelBus/src/internal/RgbwColor.cpp"
         "NeoPixelBus/src/internal/SegmentDigit.cpp"
+    REQUIRES driver
     INCLUDE_DIRS .
 )
 
